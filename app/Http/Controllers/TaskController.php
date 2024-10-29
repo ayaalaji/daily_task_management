@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\Task\StoreRequest;
 use App\Http\Requests\Task\UpdateRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class TaskController extends Controller
@@ -18,10 +19,14 @@ class TaskController extends Controller
     public function __construct(TaskService $taskService)
     {
         $this->taskService = $taskService;
+        $this->middleware('auth');
+        $this->middleware('security');
     }
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of Tasks.
+     * using Caching.
+     * @return view (task.index)
      */
     public function index()
     {
@@ -32,7 +37,8 @@ class TaskController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new task.
+     * @return view (task.create)
      */
     public function create()
     {
@@ -40,7 +46,8 @@ class TaskController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created task.
+     * after we added task successfully redirect to the view (task.index)
      */
     public function store(StoreRequest $request,Task $task)
     {
@@ -51,13 +58,16 @@ class TaskController extends Controller
             return redirect()->route('task.index');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Failed to store task: ' . $th->getMessage());
+        } catch (ModelNotFoundException $th){
+            return redirect()->back()->with('error', 'Failed to update task: ' . $th->getMessage());
         }
     }
 
     
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified task.
+     * @return view (task.edit)
      */
     public function edit(Task $task)
     {
@@ -65,7 +75,9 @@ class TaskController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified task in storage.
+     * the user who add task is the only user can edit it.
+     * after we update task successfully ... redirect to the view (task.index)
      */
     public function update(UpdateRequest $request, Task $task)
     {
@@ -75,6 +87,8 @@ class TaskController extends Controller
             session()->flash('success', 'تم تحديث المهمة بنجاح');
             return redirect()->route('task.index');
         } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Failed to update task: ' . $th->getMessage());
+        } catch (ModelNotFoundException $th){
             return redirect()->back()->with('error', 'Failed to update task: ' . $th->getMessage());
         }
     }
@@ -95,12 +109,9 @@ class TaskController extends Controller
             return redirect()->route('task.index');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Failed to delete task: ' . $th->getMessage());
+        } catch (ModelNotFoundException $th){
+            return redirect()->back()->with('error', 'Failed to update task: ' . $th->getMessage());
         }
     }
 
-    public function toggleStatus(Task $task)
-    {
-        $this->taskService->toggleTaskStatus($task);
-        return redirect()->route('task.index');
-    }
 }

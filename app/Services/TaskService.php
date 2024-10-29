@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class TaskService {
+    /**
+     * add new task 
+     * @param array $data
+     * @param Task $task
+     */
     public function createTask(array $data,Task $task)
     {
         return Task::create([
@@ -21,6 +26,11 @@ class TaskService {
 
     }
 
+    /**
+     * update specifice task that only added by the same user he wanted to update it
+     * @param array $data
+     * @param Task $task
+     */
     public function updateTask(Task $task,array $data)
     {
         if(Auth::user()->id == $task->user_id)
@@ -39,6 +49,10 @@ class TaskService {
         }
     }
 
+    /**
+     * delete specifice task that only added by the same user he wanted to delete it
+     * @param Task $task
+     */
     public function deleteTask(Task $task)
     {
         if(Auth::user()->id == $task->user_id) 
@@ -50,9 +64,4 @@ class TaskService {
         }
     }
 
-    public function toggleTaskStatus(Task $task)
-    {
-        $task->status = $task->status == 'Pending' ? 'Completed' : 'Pending';
-        $task->save();
-    }
 }
