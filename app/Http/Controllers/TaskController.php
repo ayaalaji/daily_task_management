@@ -48,6 +48,8 @@ class TaskController extends Controller
     /**
      * Store a newly created task.
      * after we added task successfully redirect to the view (task.index)
+     * @param StoreRequest $request
+     * @param Task $task
      */
     public function store(StoreRequest $request,Task $task)
     {
@@ -67,6 +69,7 @@ class TaskController extends Controller
 
     /**
      * Show the form for editing the specified task.
+     * @param Task $task
      * @return view (task.edit)
      */
     public function edit(Task $task)
@@ -78,6 +81,8 @@ class TaskController extends Controller
      * Update the specified task in storage.
      * the user who add task is the only user can edit it.
      * after we update task successfully ... redirect to the view (task.index)
+     * @param UpdateRequest $request
+     * @param Task $task
      */
     public function update(UpdateRequest $request, Task $task)
     {
@@ -94,7 +99,10 @@ class TaskController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified task from storage.
+     * the user who add task is the only user can delete it.
+     * after we delete task successfully ... redirect to the view (task.index)
+     * @param Task $task
      */
     public function destroy(Task $task)
     {
